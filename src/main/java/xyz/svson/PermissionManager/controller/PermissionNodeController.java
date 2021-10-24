@@ -1,14 +1,15 @@
 package xyz.svson.PermissionManager.controller;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import xyz.svson.PermissionManager.model.IdMessage;
 import xyz.svson.PermissionManager.model.Permission;
 import xyz.svson.PermissionManager.model.PermissionNode;
-import xyz.svson.PermissionManager.model.ResponseMessage;
 import xyz.svson.PermissionManager.repository.PermissionNodeRepository;
 import xyz.svson.PermissionManager.repository.PermissionRepository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,45 +30,29 @@ public class PermissionNodeController {
     }
 
     @PostMapping(consumes = "application/json")
-    public HashMap<String, Object> node_post(@RequestBody PermissionNode node) {
-        HashMap<String, Object> ret = new HashMap<>();
+    public IdMessage nodePost(@RequestBody PermissionNode node) {
         Optional<Permission> p = this.permissionRepository.findById(node.getPermissionId());
         if (!p.isPresent()) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No such permission");
         }
 
         node.setPermission(p.get());
         node = repository.save(node);
 
-        ret.put("id", node.getId());
-        return ret;
-    }
-
-    @PutMapping(consumes = "application/json")
-    public HashMap<String, Object> node_put(@RequestBody PermissionNode node) {
-        HashMap<String, Object> ret = new HashMap<>();
-        Optional<PermissionNode> p = this.repository.findById(node.getId());
-        if (!p.isPresent()) {
-            return null;
-        }
-
-        node = this.repository.save(node);
-        System.out.println(node);
-        return ret;
+        return new IdMessage(node.getId());
     }
 
     @PutMapping(value = "/{id}/parent", consumes = "application/json")
-    public HashMap<String, Object> nodeByIdPutParent(@PathVariable("id") Long id, @RequestBody IdMessage parentId) {
-        HashMap<String, Object> ret = new HashMap<>();
+    public void nodeByIdPutParent(@PathVariable("id") Long id, @RequestBody IdMessage parentId) {
         Optional<PermissionNode> child = this.repository.findById(id);
         if (!child.isPresent()) {
-            return null;
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Child does not exist");
         }
 
         if (parentId.getId() != null) {
             Optional<PermissionNode> parentNode = this.repository.findById(parentId.getId());
             if (!parentNode.isPresent()) {
-                return null;
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parent does not exist");
             }
             child.get().setParent(parentNode.get());
         } else {
@@ -75,13 +60,14 @@ public class PermissionNodeController {
         }
 
         this.repository.save(child.get());
-
-        return ret;
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseMessage nodeByIdDelete(@PathVariable("id") Long id) {
-        this.repository.deleteById(id);
-        return new ResponseMessage("OK");
+    public void nodeByIdDelete(@PathVariable("id") Long id) {
+        try {
+            this.repository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Node does not exist");
+        }
     }
 }
