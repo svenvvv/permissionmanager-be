@@ -8,7 +8,6 @@ import xyz.svson.PermissionManager.model.ResponseMessage;
 import xyz.svson.PermissionManager.repository.PermissionNodeRepository;
 import xyz.svson.PermissionManager.repository.PermissionRepository;
 
-import javax.persistence.Id;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;

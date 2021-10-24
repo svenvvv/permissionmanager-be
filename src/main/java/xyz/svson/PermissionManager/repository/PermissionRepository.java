@@ -1,7 +1,7 @@
 package xyz.svson.PermissionManager.repository;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import xyz.svson.PermissionManager.model.Permission;
 
-public interface PermissionRepository extends CrudRepository<Permission, Long> {
+public interface PermissionRepository extends JpaRepository<Permission, Long> {
 }
