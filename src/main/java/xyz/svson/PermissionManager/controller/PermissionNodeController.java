@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/api/permissions/nodes")
 public class PermissionNodeController {
     private final PermissionNodeRepository repository;
     private final PermissionRepository permissionRepository;
@@ -22,12 +23,12 @@ public class PermissionNodeController {
         this.permissionRepository = permissionRepo;
     }
 
-    @GetMapping("/api/permissions/nodes")
+    @GetMapping
     public List<PermissionNode> list() {
         return (List<PermissionNode>) repository.findAll();
     }
 
-    @PostMapping(value = "/api/permissions/nodes", consumes = "application/json")
+    @PostMapping(consumes = "application/json")
     public HashMap<String, Object> node_post(@RequestBody PermissionNode node) {
         HashMap<String, Object> ret = new HashMap<>();
         Optional<Permission> p = this.permissionRepository.findById(node.getPermissionId());
@@ -42,7 +43,7 @@ public class PermissionNodeController {
         return ret;
     }
 
-    @PutMapping(value = "/api/permissions/nodes", consumes = "application/json")
+    @PutMapping(consumes = "application/json")
     public HashMap<String, Object> node_put(@RequestBody PermissionNode node) {
         HashMap<String, Object> ret = new HashMap<>();
         Optional<PermissionNode> p = this.repository.findById(node.getId());
@@ -55,7 +56,7 @@ public class PermissionNodeController {
         return ret;
     }
 
-    @PutMapping(value = "/api/permissions/nodes/{id}/parent", consumes = "application/json")
+    @PutMapping(value = "/{id}/parent", consumes = "application/json")
     public HashMap<String, Object> nodeByIdPutParent(@PathVariable("id") Long id, @RequestBody IdMessage parentId) {
         HashMap<String, Object> ret = new HashMap<>();
         Optional<PermissionNode> child = this.repository.findById(id);
@@ -78,7 +79,7 @@ public class PermissionNodeController {
         return ret;
     }
 
-    @DeleteMapping(value = "/api/permissions/nodes/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseMessage nodeByIdDelete(@PathVariable("id") Long id) {
         this.repository.deleteById(id);
         return new ResponseMessage("OK");
