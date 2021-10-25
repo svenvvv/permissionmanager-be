@@ -39,7 +39,13 @@ public class PermissionController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing title");
         }
 
-        var existingPermission = repository.findByTitle(permission.getTitle());
+        var title = permission.getTitle().trim();
+        if (title.length() < 3) {
+            logger.warn("createPermission(): Attempted to create permission too short of a title");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Title must be at least 3 characters");
+        }
+
+        var existingPermission = repository.findByTitle(title);
         if (existingPermission.isPresent()) {
             logger.warn("createPermission(): Attempted to create permission with non-unique title");
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Non-unique title");
