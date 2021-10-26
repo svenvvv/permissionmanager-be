@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  * 		*) Text as permission ID, must reject.
  * 	*) setNodeParent():
  * 		*) Common tests,
+ * 		*) Null parent ID (adopt to root node), must accept,
  * 		*) Invalid parent ID, must reject,
  * 		*) Invalid child ID, must reject,
  * 		*) Either ID as text, must reject.

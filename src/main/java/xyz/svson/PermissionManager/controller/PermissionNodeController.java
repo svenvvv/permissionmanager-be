@@ -82,12 +82,15 @@ public class PermissionNodeController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Parent does not exist");
             }
             child.get().setParent(parentNode.get());
+
+            logger.debug("setNodeParent(): Adopted child (ID {}) to parent (ID {})",
+                         child.get().getId(), child.get().getParent().getId());
         } else {
             child.get().setParent(null);
-        }
 
-        logger.debug("setNodeParent(): Adopted child (ID {}) to parent (ID {})",
-                     child.get().getId(), child.get().getParent().getId());
+            logger.debug("setNodeParent(): Adopted child (ID {}) to root node",
+                         child.get().getId());
+        }
 
         this.repository.save(child.get());
     }
